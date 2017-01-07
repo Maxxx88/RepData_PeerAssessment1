@@ -1,19 +1,15 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: html_document
-html_document:
-keep_md: true
-author: "Max"
-date: "1/7/2017"
----
+## -------------------------------------------
+##
+## Created by: Max
+## Created date: 07/01/2016
+## Description: Create report
+##
+##
+## Modification date:
+## Modify by: 
+##
+## -------------------------------------------
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-## Loading and preprocessing the data
-
-```{r}
 # Specific library to load
 library(ggplot2)
 library(plyr)
@@ -25,16 +21,12 @@ zipFile  <- "./activity.zip"
 # Extract data file 
 unzip(zipFile)
 
+
 # Read the file
 mydata <- read.csv(fileName)
 mydata$date = as.POSIXct(mydata$date)
-```
 
-
-
-## What is mean total number of steps taken per day?
-
-```{r}
+# What is mean total number of steps taken per day?
 step.day <- aggregate(mydata$steps, by = list(mydata$date), sum, na.rm=TRUE) 
 names(step.day) <- c("Date", "steps")
 # Make a histogram of the total number of steps taken each day
@@ -42,15 +34,8 @@ qplot(step.day$steps, geom = "histogram", binwidth = 400,
       xlab = "Daily # steps", ylab = "Count", main = "Total # steps taken each day")
 step.day.mean <- mean(step.day$steps) # 10766.19
 step.day.median <- median(step.day$steps) # 10765
-```
 
-The mean total number of steps taken per day is: 10766.19
-The median total number of steps taken per day is: 10765
-
-
-## What is the average daily activity pattern?
-
-```{r}
+# What is the average daily activity pattern?
 step.act <- aggregate(mydata$steps, by = list(mydata$interval), mean, na.rm=TRUE)
 step.act.med <- aggregate(mydata$steps, by = list(mydata$interval), median, na.rm=TRUE)
 step.act <- cbind(step.act[], step.act.med$x)
@@ -62,20 +47,9 @@ step.act$steps.median <- round(step.act$steps.median)
 ggplot(step.act, aes(x = interval, y = steps.mean)) + geom_line()
 
 step.act.max <- step.act$interval[step.act$steps.mean == max(step.act$steps.mean) ] # 835
-```
 
-The 5-minutes interval, on average across all the days in the dataset, that contains the maximum number of steps is: 835
-
-
-## Imputing missing values
-
-```{r}
+# Imputing missing values
 num.NA <- sum(is.na(mydata$steps)) # 2304
-```
-
-The total number of missing values in the dataset is: 2304
-
-```{r}
 # Replace NAs by the median of the period
 step <- data.frame(date = mydata$date[is.na(mydata$steps)], 
                     interval = mydata$interval[is.na(mydata$steps)],
@@ -90,18 +64,6 @@ qplot(steps, data = step.day2, geom="histogram", xlab = "Daily Number of Steps",
 
 step2.mean <- mean(step.day2$steps) # 9503.869
 step2.median <- median(step.day2$steps) # 10395
-```
-
-The mean total number of steps taken per day is: 9503.869 (previous value was: 10766.19)
-The median total number of steps taken per day is: 10395 (previous value was: 10765)
-
-The values obviously differ as the NA values are integrated so we are divided the total by a higher number which means the result is smaller.
-
-
-## Are there differences in activity patterns between weekdays and weekends?
-
-```{r}
-
 
 # Create the Weekday/Weekend in new column
 mydata2$week <- ifelse(weekdays(mydata2$date) == "Saturday" | weekdays(mydata2$date) == "Sunday" ,"weekend","weekday")
@@ -114,11 +76,9 @@ names(step3) = c("weekday", "interval","step.mean", "step.median")
 
 # Create the graph
 ggplot(step3, aes(x = interval, y = step.mean)) + ylab("# steps") + geom_line() + facet_grid(weekday~.)
-```
 
-The difference is noticable:
 
- * The weekend, the values are much higher => more walking during the weekend.
- 
- * The weekday, we can see that there are also more activity earlier in the morning. And a higher peak in teh morning than in the weekday (probaly when the guy go to work where the distance is higher than what he s doing during the weekend). Then the walking is pretty low which could means that the guy have a job where he is sitting most of the time.
+# Clean all variables before end  
+remove(list = ls())
 
+## End
